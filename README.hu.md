@@ -57,7 +57,7 @@ Ez a csomag egy komponens, nem tanúsított számlázó rendszer (SIF). A száml
 - PHP 8.3+ a `dom`, `libxml`, `mbstring`, `openssl` és `zlib` kiterjesztéssel
 - Laravel 12 vagy 13
 - Közvetlen AEAT-beküldéshez: a kibocsátó (vagy képviselője) minősített tanúsítványa, és egy CA-csomag, amely tartalmazza az **AC RAIZ FNMT-RCM SERVIDORES SEGUROS** FNMT gyökértanúsítványt
-- Opcionális: `chillerlan/php-qrcode` ^5 a QR-kód kirajzolásához (`composer require chillerlan/php-qrcode`)
+- Opcionális: `chillerlan/php-qrcode` ^5 (`composer require chillerlan/php-qrcode`) a QR-kód kirajzolásához, B2Brouter módban pedig a B2Brouter QR-képének visszafejtéséhez a keresztellenőrzés 5. lépésében; a visszafejtéshez `ext-gd` vagy `ext-imagick` kell, ezek nélkül a QR URL-t a paraméterei alapján vetjük össze
 
 ## Telepítés
 

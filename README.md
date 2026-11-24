@@ -55,7 +55,7 @@ This package is a component, not a certified billing system (SIF). The producer 
 - PHP 8.3+ with `dom`, `libxml`, `mbstring`, `openssl` and `zlib`
 - Laravel 12 or 13
 - For direct AEAT submission: the issuer's (or its representative's) qualified certificate, and a CA bundle with the FNMT root **AC RAIZ FNMT-RCM SERVIDORES SEGUROS**
-- Optional: `chillerlan/php-qrcode` ^5 to render the QR code (`composer require chillerlan/php-qrcode`)
+- Optional: `chillerlan/php-qrcode` ^5 (`composer require chillerlan/php-qrcode`) to render the QR code and, in B2Brouter mode, to decode B2Brouter's QR image for step 5 of the cross-check; decoding needs `ext-gd` or `ext-imagick`, and without them the QR URL is compared by its parameters
 
 ## Quick start
 
