@@ -1,0 +1,76 @@
+name: install
+
+# Installs the published metapackage into a fresh Laravel application, installs the AEAT schemas
+# and runs the doctor. Requires intragile/laravel-verifactu and its dependencies on Packagist, so it
+# works after the release. Nothing is ever sent: no record is registered and no AEAT endpoint is
+# called.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "23 5 * * 3"
+  workflow_dispatch:
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.3', '8.4', '8.5']
+        laravel: ['12.*', '13.*']
+    name: PHP ${{ matrix.php }} / Laravel ${{ matrix.laravel }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, libxml, mbstring, zlib, sqlite3, pdo_sqlite, openssl
+          coverage: none
+      - run: composer validate --strict
+      - name: Create a fresh Laravel application
+        run: composer create-project "laravel/laravel:${{ matrix.laravel }}" app --no-interaction --no-progress --prefer-dist
+      - name: Require the metapackage
+        working-directory: app
+        run: composer require intragile/laravel-verifactu:^1.0 --no-interaction --no-progress
+      - name: Make a throwaway certificate
+        # A self-signed PKCS#12 that only lets the doctor read a certificate; AEAT would refuse it.
+        run: |
+          openssl req -x509 -newkey rsa:2048 -nodes -days 2 \
+            -subj "/CN=Throwaway CI certificate" \
+            -keyout "$RUNNER_TEMP/aeat.key.pem" -out "$RUNNER_TEMP/aeat.crt.pem"
+          openssl pkcs12 -export -inkey "$RUNNER_TEMP/aeat.key.pem" -in "$RUNNER_TEMP/aeat.crt.pem" \
+            -out "$RUNNER_TEMP/aeat.p12" -passout pass:throwaway-ci-password
+          rm "$RUNNER_TEMP/aeat.key.pem"
+      - name: Install the schemas and run the doctor
+        working-directory: app
+        # Placeholder configuration: the doctor only checks that it is present and well formed.
+        # The AEAT test environment is the only one this job ever points at, and the job never
+        # submits. The RECOMMAND keys satisfy the default Peppol transport, which the doctor checks
+        # as well. The SistemaInformatico values name a fictitious producer, never IntrAgile.
+        env:
+          RECOMMAND_API_KEY_ID: key_placeholder
+          RECOMMAND_API_SECRET: secret_placeholder
+          RECOMMAND_COMPANY_ID: c_placeholder
+          VERIFACTU_ENVIRONMENT: test
+          VERIFACTU_DRIVER: aeat
+          VERIFACTU_ISSUER_NIF: B64829179
+          VERIFACTU_ISSUER_NAME: "Emisor Prueba S.L."
+          VERIFACTU_PRODUCER_NAME: "Test Producer S.L."
+          VERIFACTU_PRODUCER_NIF: A39200019
+          VERIFACTU_SYSTEM_NAME: TestSIF
+          VERIFACTU_SYSTEM_ID: "77"
+          VERIFACTU_SYSTEM_VERSION: 1.0.03
+          VERIFACTU_INSTALLATION_NUMBER: "383"
+          VERIFACTU_SYSTEM_VERIFACTU_ONLY: "true"
+          VERIFACTU_SYSTEM_MULTIPLE_TAXPAYERS_POSSIBLE: "false"
+          VERIFACTU_SYSTEM_MULTIPLE_TAXPAYERS_INDICATOR: "false"
+          VERIFACTU_AEAT_CERTIFICATE: ${{ runner.temp }}/aeat.p12
+          VERIFACTU_AEAT_PASSWORD: throwaway-ci-password
+        run: |
+          php artisan einvoicing:install-rules
+          php artisan einvoicing:verifactu-install-schemas
+          php artisan migrate --force --no-interaction
+          php artisan einvoicing:doctor

@@ -1,0 +1,42 @@
+{
+    "name": "intragile/laravel-verifactu",
+    "description": "Spanish VERI*FACTU for Laravel: generate, hash, chain and submit AEAT billing records (RegistroAlta, RegistroAnulacion) from EN 16931 invoices, directly to AEAT or through B2Brouter, with QR codes and chain verification, on top of intragile/laravel-einvoicing.",
+    "keywords": [
+        "laravel",
+        "verifactu",
+        "veri-factu",
+        "aeat",
+        "facturacion",
+        "sif",
+        "registro-de-facturacion",
+        "spain",
+        "espana",
+        "e-invoicing",
+        "qr",
+        "rrsif"
+    ],
+    "type": "metapackage",
+    "license": "MIT",
+    "homepage": "https://intragile.eu",
+    "support": {
+        "issues": "https://github.com/intragile/laravel-verifactu/issues",
+        "source": "https://github.com/intragile/laravel-verifactu"
+    },
+    "authors": [
+        {
+            "name": "IntrAgile Kft.",
+            "email": "info@intragile.eu",
+            "homepage": "https://intragile.eu"
+        }
+    ],
+    "require": {
+        "intragile/laravel-einvoicing": "^1.3",
+        "intragile/php-einvoicing": "^1.3",
+        "php": "^8.3"
+    },
+    "suggest": {
+        "chillerlan/php-qrcode": "Renders the VERI*FACTU QR code as SVG or PNG (^5; PNG needs ext-gd)"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
