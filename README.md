@@ -9,7 +9,7 @@ Developed and maintained by [IntrAgile Kft.](https://intragile.eu)
 
 Spanish **VERI\*FACTU** for Laravel: generate, hash, chain and submit the AEAT billing records (`RegistroAlta`, `RegistroAnulacion`) of your invoices from EN 16931 invoices, directly to the AEAT or through B2Brouter, with QR codes and chain verification.
 
-> **Status:** not released yet: it needs `intragile/laravel-einvoicing` 1.3 and `intragile/php-einvoicing` 1.3.
+> **Status:** version 1.0.0, released 2026-11-24. It needs `intragile/laravel-einvoicing` 1.3 and `intragile/php-einvoicing` 1.3.
 
 > **Release label:** Verifactu live-verified on the B2Brouter sandbox (registered; hash and QR cross-checked); direct AEAT submission verified offline only — it needs a Spanish NIF and a qualified certificate
 
@@ -59,7 +59,7 @@ This package is a component, not a certified billing system (SIF). The producer 
 
 ## Quick start
 
-Once released:
+Install:
 
 ```bash
 composer require intragile/laravel-verifactu

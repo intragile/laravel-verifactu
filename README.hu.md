@@ -9,7 +9,7 @@ Fejlesztő és karbantartó: [IntrAgile Kft.](https://intragile.eu)
 
 A spanyol **VERI\*FACTU** Laravelhez: a számláid AEAT-nyilvántartási rekordjainak (`RegistroAlta`, `RegistroAnulacion`) előállítása EN 16931 szerinti számlákból, hash-elése, láncba fűzése és beküldése közvetlenül az AEAT-nak vagy a B2Brouteren keresztül, QR-kóddal és láncellenőrzéssel.
 
-> **Állapot:** még nincs kiadva: az `intragile/laravel-einvoicing` 1.3-at és az `intragile/php-einvoicing` 1.3-at igényli.
+> **Állapot:** 1.0.0-s verzió, kiadva 2026-11-24-én. Az `intragile/laravel-einvoicing` 1.3-at és az `intragile/php-einvoicing` 1.3-at igényli.
 
 > **Release label:** Verifactu live-verified on the B2Brouter sandbox (registered; hash and QR cross-checked); direct AEAT submission verified offline only — it needs a Spanish NIF and a qualified certificate
 >

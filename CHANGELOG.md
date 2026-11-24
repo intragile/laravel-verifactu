@@ -8,9 +8,11 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-24
+
 ### Added
 
-- A metapackage that requires `intragile/laravel-einvoicing` (`^1.3`) and `intragile/php-einvoicing` (`^1.3`), so that the Spanish VERI\*FACTU use case is found by its name. It ships no code. It is not released yet: it needs `intragile/laravel-einvoicing` 1.3.
+- A metapackage that requires `intragile/laravel-einvoicing` (`^1.3`) and `intragile/php-einvoicing` (`^1.3`), so that the Spanish VERI\*FACTU use case is found by its name. It ships no code.
 - Release label: Verifactu live-verified on the B2Brouter sandbox (registered; hash and QR cross-checked); direct AEAT submission verified offline only — it needs a Spanish NIF and a qualified certificate
 
 ---
