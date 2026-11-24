@@ -21,9 +21,9 @@ Ez egy vékony metacsomag: nincs saját kódja, csak a [`intragile/laravel-einvo
 
 ## Amit a spanyol folyamat lefed
 
-- **Rekordok:** minden számlához egy `RegistroAlta`, minden sztornóhoz egy `RegistroAnulacion`, a motor modelljének EN 16931 szerinti számlájából előállítva, a helyesbítő számlákat és az adómentes tételeket is beleértve.
+- **Rekordok:** minden számlához egy `RegistroAlta`, a motor modelljének EN 16931 szerinti számlájából előállítva, a helyesbítő számlákat és az adómentes tételeket is beleértve. A közvetlen AEAT driverrel minden sztornóhoz egy `RegistroAnulacion`, minden javításhoz egy új regisztráció; B2Brouter módban a bridge nem sztornóz és nem javít (a `cancel()` és a `correct()` kivételt dob), a sztornókat a B2Brouterben kell kezelni.
 - **Lánc:** minden rekord SHA-256 `Huella`-ja, kibocsátónként és telepítésenként láncba fűzve az adatbázisban; a lánc egy másik számlázó rendszer rekordjaiból is folytatható, és az `einvoicing:verifactu-verify-chain` ellenőrzi.
-- **QR-kód:** az AEAT ellenőrző URL-je a rekord előállításakor azonnal visszajön, így a számla rögtön nyomtatható.
+- **QR-kód:** a közvetlen AEAT driverrel az AEAT ellenőrző URL-je a rekord előállításakor azonnal visszajön, így a számla rögtön nyomtatható. B2Brouter módban a rekord függőben van, és a `qr_url` üres, amíg a B2Brouter regisztrált rekordja be nem kapcsolódik; ekkor a sorban ott a B2Brouter által nyomtatott QR URL és a hash, és elsül a `VerifactuRecordRegistered` esemény.
 - **Közvetlen AEAT-beküldés:** sorba állítva, az AEAT forgalomszabályozását betartva, kölcsönös TLS-sel, a kibocsátó minősített tanúsítványával.
 - **B2Brouter:** az AEAT felőli oldalt a B2Brouter is átveheti, aszinkron módon; az általa visszaadott rekordot a saját hash-ünkkel, láncunkkal és QR-kódunkkal vetjük össze.
 - **Doctor:** az `einvoicing:doctor` ellenőrzi a beállításokat, a sémákat, a tanúsítványt és a láncokat.
@@ -100,17 +100,18 @@ VERIFACTU_AEAT_PASSWORD=...
 # VERIFACTU_B2BROUTER_TRANSPORT=b2brouter
 ```
 
-Számla regisztrálása és QR-kódjának azonnali nyomtatása; a rekord a queue-n át megy be:
+Számla regisztrálása és – a közvetlen AEAT driverrel – QR-kódjának azonnali nyomtatása; a rekord a queue-n át megy be:
 
 ```php
 use IntrAgile\EInvoicing\Laravel\Facades\EInvoicing;
 
 $record = EInvoicing::verifactu()->register($invoice);   // a core modell EN 16931 szerinti számlája
 
-$record->qr_url;   // az AEAT ellenőrző URL-je, amelyet a számlára kell nyomtatni
+$record->qr_url;   // AEAT driver: az AEAT ellenőrző URL-je, amelyet a számlára kell nyomtatni
+                   // B2Brouter mód: null a VerifactuRecordRegistered eseményig
 ```
 
-Kezdd a `VERIFACTU_ENVIRONMENT=test` beállítással: a rekordok csak `production` környezetben mennek az AEAT éles szolgáltatásába. A sztornózást és a helyesbítést, a queue-t és a forgalomszabályozást, a B2Brouter módot, a lánc folytatását, az eseményeket, a parancsokat és a doctort a [Spanish VERI\*FACTU szakasz](https://github.com/intragile/laravel-einvoicing#spanish-verifactu) írja le; a rekordleképezést, a láncot, a QR-kódot és a transportokat a [spanyol országjegyzet](https://github.com/intragile/php-einvoicing/blob/main/docs/countries/SPAIN.md) (angolul).
+Kezdd a `VERIFACTU_ENVIRONMENT=test` beállítással: a rekordok csak `production` környezetben mennek az AEAT éles szolgáltatásába. A sztornózást és a helyesbítést (csak a közvetlen AEAT driverrel), a queue-t és a forgalomszabályozást, a B2Brouter módot, a lánc folytatását, az eseményeket, a parancsokat és a doctort a [Spanish VERI\*FACTU szakasz](https://github.com/intragile/laravel-einvoicing#spanish-verifactu) írja le; a rekordleképezést, a láncot, a QR-kódot és a transportokat a [spanyol országjegyzet](https://github.com/intragile/php-einvoicing/blob/main/docs/countries/SPAIN.md) (angolul).
 
 ## Miben más
 

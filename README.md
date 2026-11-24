@@ -19,9 +19,9 @@ This is a thin metapackage: it has no code of its own and pulls in [`intragile/l
 
 ## What the Spanish flow covers
 
-- **Records:** a `RegistroAlta` for every invoice and a `RegistroAnulacion` for every cancellation, generated from an EN 16931 invoice of the engine's model, including corrective invoices and exempt lines.
+- **Records:** a `RegistroAlta` for every invoice, generated from an EN 16931 invoice of the engine's model, including corrective invoices and exempt lines. On the direct AEAT driver, a `RegistroAnulacion` for every cancellation and a new registration for every correction; in B2Brouter mode the bridge does not cancel or correct (`cancel()` and `correct()` throw), so cancellations are managed in B2Brouter.
 - **Chain:** the SHA-256 `Huella` of every record, chained per issuer and installation in the database; a chain can be seeded from the records of another billing system, and `einvoicing:verifactu-verify-chain` checks it.
-- **QR code:** the AEAT verification URL is returned as soon as the record is generated, so the invoice can be printed at once.
+- **QR code:** on the direct AEAT driver, the AEAT verification URL is returned as soon as the record is generated, so the invoice can be printed at once. In B2Brouter mode the record is pending and its `qr_url` is empty until B2Brouter's registered record is attached; then the row holds the QR URL B2Brouter prints and the hash, and `VerifactuRecordRegistered` fires.
 - **Direct AEAT submission:** queued, under the AEAT flow control, over mutual TLS with the issuer's qualified certificate.
 - **B2Brouter:** B2Brouter can take the AEAT side instead, asynchronously; the record it returns is cross-checked against our own hash, chain and QR.
 - **Doctor:** `einvoicing:doctor` checks the configuration, the schemas, the certificate and the chains.
@@ -98,17 +98,18 @@ VERIFACTU_AEAT_PASSWORD=...
 # VERIFACTU_B2BROUTER_TRANSPORT=b2brouter
 ```
 
-Register an invoice and print its QR code at once; the record is submitted through the queue:
+Register an invoice and, on the direct AEAT driver, print its QR code at once; the record is submitted through the queue:
 
 ```php
 use IntrAgile\EInvoicing\Laravel\Facades\EInvoicing;
 
 $record = EInvoicing::verifactu()->register($invoice);   // an EN 16931 invoice of the core model
 
-$record->qr_url;   // the AEAT verification URL to print on the invoice
+$record->qr_url;   // AEAT driver: the AEAT verification URL to print on the invoice
+                   // B2Brouter mode: null until VerifactuRecordRegistered
 ```
 
-Start with `VERIFACTU_ENVIRONMENT=test`: records go to the AEAT production service only when the environment is `production`. Cancelling and correcting, the queue and the flow control, B2Brouter mode, seeding a chain, the events, the commands and the doctor are described in the [Spanish VERI\*FACTU section](https://github.com/intragile/laravel-einvoicing#spanish-verifactu); the record mapping, the chain, the QR code and the transports in the [Spain country notes](https://github.com/intragile/php-einvoicing/blob/main/docs/countries/SPAIN.md).
+Start with `VERIFACTU_ENVIRONMENT=test`: records go to the AEAT production service only when the environment is `production`. Cancelling and correcting (direct AEAT driver only), the queue and the flow control, B2Brouter mode, seeding a chain, the events, the commands and the doctor are described in the [Spanish VERI\*FACTU section](https://github.com/intragile/laravel-einvoicing#spanish-verifactu); the record mapping, the chain, the QR code and the transports in the [Spain country notes](https://github.com/intragile/php-einvoicing/blob/main/docs/countries/SPAIN.md).
 
 ## How it differs
 
